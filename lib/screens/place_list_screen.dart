@@ -8,7 +8,6 @@ class PlacesListScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var theme = Theme.of(context);
     return Scaffold(
       appBar: AppBar(
         title: const Text('Meus Lugares'),
@@ -23,24 +22,32 @@ class PlacesListScreen extends StatelessWidget {
           ),
         ],
       ),
-      body: Consumer<GreatPlaces>(
-        builder: (ctx, greatePlaces, ch) => greatePlaces.itemsCount == 0
-            ? ch!
-            : ListView.builder(
-                itemCount: greatePlaces.itemsCount,
-                itemBuilder: (ctx, i) => ListTile(
-                  leading: CircleAvatar(
-                    backgroundImage: FileImage(
-                      greatePlaces.itemByIndex(i).image,
-                    ),
-                  ),
-                  title: Text(greatePlaces.itemByIndex(i).title),
-                  onTap: () {},
+      body: FutureBuilder(
+        future: Provider.of<GreatPlaces>(context, listen: false).loadPlaces(),
+        builder: (ctx, snapshot) => snapshot.connectionState ==
+                ConnectionState.waiting
+            ? const Center(
+                child: CircularProgressIndicator(),
+              )
+            : Consumer<GreatPlaces>(
+                builder: (ctx, greatePlaces, ch) => greatePlaces.itemsCount == 0
+                    ? ch!
+                    : ListView.builder(
+                        itemCount: greatePlaces.itemsCount,
+                        itemBuilder: (ctx, i) => ListTile(
+                          leading: CircleAvatar(
+                            backgroundImage: FileImage(
+                              greatePlaces.itemByIndex(i).image,
+                            ),
+                          ),
+                          title: Text(greatePlaces.itemByIndex(i).title),
+                          onTap: () {},
+                        ),
+                      ),
+                child: const Center(
+                  child: Text('Nenhm Local Cadastrado!'),
                 ),
               ),
-        child: const Center(
-          child: Text('Nenhm Local Cadastrado!'),
-        ),
       ),
     );
   }
